@@ -1,4 +1,14 @@
 #!/bin/bash
+
+unameOut="$(uname -s)"
+case "${unameOut}" in
+Linux*) machine=Linux ;;
+Darwin*) machine=Mac ;;
+CYGWIN*) machine=Cygwin ;;
+MINGW*) machine=MinGw ;;
+*) machine="UNKNOWN:${unameOut}" ;;
+esac
+
 rm -rf ipwndfu_public
 rm -rf ipwndfu
 
@@ -8,15 +18,13 @@ echo "Do you want to input a generator? (y,n)"
 
 read input
 
-if [ $input = y ];
-then
+if [ $input = y ]; then
     echo "Please enter your desiered generator."
 
     read generator
 
     echo "Your generator is $generator"
-elif [ $input = n ];
-then
+elif [ $input = n ]; then
 
     echo "Please drag and drop the SHSH file that you want to downgrade with into this terminal window then press enter"
 
@@ -26,50 +34,46 @@ then
 
     read pass
 
-        if [ $pass == yes ] || [ $pass == Yes ] || [ $pass == y ] || [ $pass == Y ];
-        then
-            echo "Continuing with given SHSH"
+    if [ $pass == yes ] || [ $pass == Yes ] || [ $pass == y ] || [ $pass == Y ]; then
+        echo "Continuing with given SHSH"
 
-        elif [ $pass == no ] || [ $pass == No ] || [ $pass == n ] || [ $pass == n ];
-        then
-            echo "Please restart script and give the correct location and file name"
-            echo "Exiting..."
-            exit
+    elif [ $pass == no ] || [ $pass == No ] || [ $pass == n ] || [ $pass == n ]; then
+        echo "Please restart script and give the correct location and file name"
+        echo "Exiting..."
+        exit
 
-        else
-            echo "Unrecognised input"
-            echo "Exiting..."
-            exit
+    else
+        echo "Unrecognised input"
+        echo "Exiting..."
+        exit
 
-        fi
+    fi
 
-        if [ ${shsh: -6} == ".shsh2" ] || [ ${shsh: -5} == ".shsh" ];
-        then
-            echo "File verified as SHSH2 file, continuing"
+    if [ ${shsh: -6} == ".shsh2" ] || [ ${shsh: -5} == ".shsh" ]; then
+        echo "File verified as SHSH2 file, continuing"
 
-        else
-            echo "Please ensure that the file extension is either .shsh or .shsh2 and retry"
-            echo "Exiting..."
-            exit
-        fi
+    else
+        echo "Please ensure that the file extension is either .shsh or .shsh2 and retry"
+        echo "Exiting..."
+        exit
+    fi
 
-        echo "Getting generator from SHSH"
+    echo "Getting generator from SHSH"
 
-        getGenerator() {
-        echo $1 | grep "<string>0x" $shsh  | cut -c10-27
-        }
-        generator=$(getGenerator $shsh)
+    getGenerator() {
+        echo $1 | grep "<string>0x" $shsh | cut -c10-27
+    }
+    generator=$(getGenerator $shsh)
 
-        if [ -z "$generator" ]
-        then
-            echo "[ERROR] SHSH does not contain a generator!"
-            echo "[ERROR] Please use a different SHSH with a generator!"
-            echo "[ERROR] SHSH saved with shsh.host (will show generator) or tsssaver.1conan.com (in noapnonce folder) are acceptable"
-            echo "Exiting..."
-            exit
-        else
-            echo "Your generator is: $generator"
-        fi
+    if [ -z "$generator" ]; then
+        echo "[ERROR] SHSH does not contain a generator!"
+        echo "[ERROR] Please use a different SHSH with a generator!"
+        echo "[ERROR] SHSH saved with shsh.host (will show generator) or tsssaver.1conan.com (in noapnonce folder) are acceptable"
+        echo "Exiting..."
+        exit
+    else
+        echo "Your generator is: $generator"
+    fi
 
 else
     echo "Input not recognized, Exiting..."
@@ -78,87 +82,95 @@ fi
 
 echo "$generator"
 
-
-files/igetnonce | grep 'n53ap' &> /dev/null
-if [ $? == 0 ]; then
-   echo "Supported Device"
-   device="iPhone6,2"
-   echo $device
+if [ ${machine} == "Mac" ]; then
+    string=$(../files/lsusb | grep -c "checkm8")
+elif [ ${machine} == "Linux" ]; then
+    string=$(/usr/bin/lsusb | grep -c "checkm8")
+else
+    echo "OS not supported"
+    echo "Exiting..."
+    exit
 fi
 
-files/igetnonce | grep 'n51ap' &> /dev/null
+$string | grep 'n53ap' &>/dev/null
 if [ $? == 0 ]; then
-   echo "Supported Device"
-   device="iPhone6,1"
-   echo $device
+    echo "Supported Device"
+    device="iPhone6,2"
+    echo $device
 fi
 
-files/igetnonce | grep 'j71ap' &> /dev/null
+$string | grep 'n51ap' &>/dev/null
 if [ $? == 0 ]; then
-   echo "Supported Device"
-   device="iPad4,1"
-   echo $device
+    echo "Supported Device"
+    device="iPhone6,1"
+    echo $device
 fi
 
-files/igetnonce | grep 'j72ap' &> /dev/null
+$string | grep 'j71ap' &>/dev/null
 if [ $? == 0 ]; then
-   echo "Supported Device"
-   device="iPad4,2"
-   echo $device
+    echo "Supported Device"
+    device="iPad4,1"
+    echo $device
 fi
 
-files/igetnonce | grep 'j85ap' &> /dev/null
+$string | grep 'j72ap' &>/dev/null
 if [ $? == 0 ]; then
-   echo "Supported Device"
-   device="iPad4,4"
-   echo $device
+    echo "Supported Device"
+    device="iPad4,2"
+    echo $device
 fi
 
-files/igetnonce | grep 'j86ap' &> /dev/null
+$string | grep 'j85ap' &>/dev/null
 if [ $? == 0 ]; then
-   echo "Supported Device"
-   device="iPad4,5"
-   echo $device
-fi
-files/igetnonce | grep 'd11ap' &> /dev/null
-if [ $? == 0 ]; then
-   echo "Supported Device"
-   device="iPhone9,2"
-   echo $device
-fi
-files/igetnonce | grep 'd10ap' &> /dev/null
-if [ $? == 0 ]; then
-   echo "Supported Device"
-   device="iPhone9,1"
-   echo $device
-fi
-files/igetnonce | grep 'd101ap' &> /dev/null
-if [ $? == 0 ]; then
-   echo "Supported Device"
-   device="iPhone9,3"
-   echo $device
-fi
-files/igetnonce | grep 'd111ap' &> /dev/null
-if [ $? == 0 ]; then
-   echo "Supported Device"
-   device="iPhone9,4"
-   echo $device
-fi
-files/igetnonce | grep 'd22ap' &> /dev/null
-if [ $? == 0 ]; then
-   echo "Supported Device"
-   device="iPhone10,3"
-   echo $device
-fi
-files/igetnonce | grep 'd221ap' &> /dev/null
-if [ $? == 0 ]; then
-   echo "Supported Device"
-   device="iPhone10,6"
-   echo $device
+    echo "Supported Device"
+    device="iPad4,4"
+    echo $device
 fi
 
-if [ -z "$device" ]
-then
+$string | grep 'j86ap' &>/dev/null
+if [ $? == 0 ]; then
+    echo "Supported Device"
+    device="iPad4,5"
+    echo $device
+fi
+$string | grep 'd11ap' &>/dev/null
+if [ $? == 0 ]; then
+    echo "Supported Device"
+    device="iPhone9,2"
+    echo $device
+fi
+$string | grep 'd10ap' &>/dev/null
+if [ $? == 0 ]; then
+    echo "Supported Device"
+    device="iPhone9,1"
+    echo $device
+fi
+$string | grep 'd101ap' &>/dev/null
+if [ $? == 0 ]; then
+    echo "Supported Device"
+    device="iPhone9,3"
+    echo $device
+fi
+$string | grep 'd111ap' &>/dev/null
+if [ $? == 0 ]; then
+    echo "Supported Device"
+    device="iPhone9,4"
+    echo $device
+fi
+$string | grep 'd22ap' &>/dev/null
+if [ $? == 0 ]; then
+    echo "Supported Device"
+    device="iPhone10,3"
+    echo $device
+fi
+$string | grep 'd221ap' &>/dev/null
+if [ $? == 0 ]; then
+    echo "Supported Device"
+    device="iPhone10,6"
+    echo $device
+fi
+
+if [ -z "$device" ]; then
     echo "Either unsupported device or no device found."
     echo "Exiting.."
     exit
@@ -179,17 +191,26 @@ else
 fi
 echo "Starting ipwndfu"
 
-string=$(../files/lsusb | grep -c "checkm8")
-until [ $string = 1 ];
-do
-    killall iTunes && killall iTunesHelper
+until [ $string = 1 ]; do
+    if [ ${machine} == "Mac" ]; then
+        killall iTunes && killall iTunesHelper
+    fi
     echo "Waiting 10 seconds to allow you to enter DFU mode"
     sleep 10
     echo "Attempting to get into pwndfu mode"
     echo "Please just enter DFU mode again on each reboot"
     echo "The script will run ipwndfu again and again until the device is in PWNDFU mode"
     ./ipwndfu -p
-    string=$(../files/lsusb | grep -c "checkm8")
+    if [ ${machine} == "Mac" ]; then
+        string=$(../files/lsusb | grep -c "checkm8")
+    elif [ ${machine} == "Linux" ]; then
+        string=$(/usr/bin/lsusb | grep -c "checkm8")
+    else
+        echo "OS not supported"
+        echo "Exiting..."
+        exit
+    fi
+
 done
 
 sleep 3
@@ -209,35 +230,49 @@ echo "Device is now in PWNDFU mode with signature checks removed (Thanks to Linu
 echo "Entering PWNREC mode"
 cd files
 
-if [ $device == iPhone10,3 ] || [ $device == iPhone10,6 ]; then
-    ./irecovery -f junk.txt
+if [ ${machine} == "Mac" ]; then
+    irecovery="./irecovery"
+elif [ ${machine} == "Linux" ]; then
+    if ! hash irecovery 2>/dev/null; then
+        echo "I require irecovery but it's not installed"
+        echo "Exiting..."
+        exit
+    fi
+    irecovery="irecovery"
+else
+    echo "OS not supported"
+    echo "Exiting..."
+    exit
 fi
 
-./irecovery -f ibss."$device".img4
+if [ $device == iPhone10,3 ] || [ $device == iPhone10,6 ]; then
+    $irecovery -f junk.txt
+fi
 
-if [ $device = iPhone6,1 ] || [ $device = iPhone6,2 ] || [ $device = iPad4,1 ] || [ $device = iPad4,2 ] || [ $device = iPad4,3 ] || [ $device = iPad4,4 ] || [ $device = iPad4,5 ] || [ $device = iPad4,6 ] || [ $device = iPad4,7 ] || [ $device = iPad4,8 ] || [ $device = iPad4,9 ];
-then
-    ./irecovery -f ibec."$device".img4
+$irecovery -f ibss."$device".img4
+
+if [ $device = iPhone6,1 ] || [ $device = iPhone6,2 ] || [ $device = iPad4,1 ] || [ $device = iPad4,2 ] || [ $device = iPad4,3 ] || [ $device = iPad4,4 ] || [ $device = iPad4,5 ] || [ $device = iPad4,6 ] || [ $device = iPad4,7 ] || [ $device = iPad4,8 ] || [ $device = iPad4,9 ]; then
+    $irecovery -f ibec."$device".img4
 fi
 
 echo "Entered PWNREC mode"
 sleep 4
 echo "Current nonce"
-./irecovery -q | grep NONC
+$irecovery -q | grep NONC
 echo "Setting nonce to $generator"
-./irecovery -c "setenv com.apple.System.boot-nonce $generator"
+$irecovery -c "setenv com.apple.System.boot-nonce $generator"
 sleep 1
-./irecovery -c "saveenv"
+$irecovery -c "saveenv"
 sleep 1
-./irecovery -c "setenv auto-boot false"
+$irecovery -c "setenv auto-boot false"
 sleep 1
-./irecovery -c "saveenv"
+$irecovery -c "saveenv"
 sleep 1
-./irecovery -c "reset"
+$irecovery -c "reset"
 echo "Waiting for device to restart into recovery mode"
 sleep 7
 echo "New nonce"
-./irecovery -q | grep NONC
+$irecovery -q | grep NONC
 
 echo "We are done!"
 echo ""
